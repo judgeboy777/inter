@@ -1,0 +1,33 @@
+head = input("Enter character that represents the starting delimiter: ")
+tail = input("Enter character that represents the ending delimiter: ")
+st = input("Enter the characters to be stuffed: ")
+
+res = head
+for i in st:
+    if i == head or i == tail:
+        res = res + i + i
+    else:
+        res = res + i
+res = res + tail
+
+print("Frame after character stuffing:", res)
+
+
+st = input("Enter the frame: ")
+count = 0
+res = ""
+
+for i in st:
+    if i == '1':
+        res += '1'
+        count += 1
+        if count == 5:
+            res += '0'
+            count = 0
+    elif i == ' ':
+        pass
+    else:
+        res += i
+        count = 0
+
+print("Frame after bit stuffing:", res)
