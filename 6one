@@ -1,0 +1,75 @@
+import socket
+import random
+import time
+
+# Create socket and bind to localhost
+s = socket.socket()
+s.bind(("localhost", 1450))
+s.listen(5)
+
+# Accept connection from client
+c, adr = s.accept()
+print("Connected to:", str(adr))
+
+# Input number of frames and window size
+n = int(input("Enter number of frames: "))
+N = int(input("Enter window size: "))
+
+seq = 1       # Window start sequence number
+frame = 1     # Frame to send starts with 1
+
+# Send initial window of frames
+for i in range(N):
+    print('Frames sent ->', frame)
+    c.send(str(frame).encode())
+    frame += 1
+    time.sleep(2)
+
+timer = 5  # Simulated timer threshold
+
+# Start receiving acknowledgements
+while frame <= n:
+    t = random.randint(1, 7)  # Simulate network delay
+    msg = c.recv(1).decode()
+    msg = int(msg)
+
+    if msg != seq:
+        # Discard frames until correct ACK is received
+        continue
+
+    if timer > t:
+        # ACK received within time
+        print("Acknowledgement received for frame", msg)
+        print('Frames sent ->', frame)
+        c.send(str(frame).encode())
+        seq += 1
+        frame += 1
+        time.sleep(2)
+    else:
+        # ACK not received, resend window from seq
+        print('Acknowledgement not received for frame', seq)
+        frame = seq
+        for i in range(N):
+            if frame <= n:
+                print('Frames sent ->', frame)
+                c.send(str(frame).encode())
+                frame += 1
+                time.sleep(2)
+#reciver side
+import socket
+import time
+
+# Create a socket and connect to the server
+s = socket.socket()
+s.connect(("localhost", 1450))
+
+while True:
+    # Receive a frame from the server
+    msg = s.recv(2).decode()
+    print("Received -->", int(msg))
+
+    # Send back the acknowledgment (same frame number)
+    s.send(str(msg).encode())
+
+    # Simulate processing delay
+    time.sleep(1)
