@@ -1,0 +1,25 @@
+print("Enter bucket size, outgoing rate, number of inputs and incoming size")
+bucketsize = int(input("Bucket size: "))
+outgoing = int(input("Outgoing rate: "))
+n = int(input("Number of inputs: "))
+incoming = int(input("Incoming size per input: "))
+
+store = 0
+
+while n != 0:
+    print("\nIncoming size is", incoming)
+
+    if incoming <= (bucketsize - store):
+        store += incoming
+        print("Bucket buffer size is", store, "out of", bucketsize)
+    else:
+        print("Packet loss:", incoming - (bucketsize - store))
+        store = bucketsize
+        print("Bucket buffer size is", store, "out of", bucketsize)
+
+    store -= outgoing
+    if store < 0:
+        store = 0
+    print("After outgoing:", store, "packets left out of", bucketsize, "in buffer")
+
+    n -= 1
