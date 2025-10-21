@@ -1,0 +1,48 @@
+import socket
+import random
+import time
+
+s = socket.socket()                     # Create a TCP socket
+s.bind(("localhost", 8011))             # Bind to localhost on port 8038
+s.listen(5)                             # Wait for up to 5 connections
+c, adr = s.accept()                     # Accept a connection from receiver
+print("from address", str(adr), "connection has established")
+n = int(input("Enter number of frames: "))     # Total frames to send
+N = int(input("Enter window size: "))          # Window size
+seq = 1                                        # Sequence number start
+frame = 1                                      # Current frame number
+# send first N frames
+for i in range(N):
+    print('Frames sent ->', frame)
+    c.send(str(frame).encode())     # send frame number to receiver
+    frame += 1
+time.sleep(2)
+timer = 5  # timer value used to simulate ACK timeout
+while frame <= n:
+    t = random.randint(1,7)         # Random delay/loss simulation
+    msg = c.recv(1).decode()        # Receive ACK from receiver
+    msg = int(msg)
+    print("Frame ", msg)
+    if(timer > t):
+        print("acknowledgement received")
+        print('Frames sent ->', str(frame))
+        c.send(str(frame).encode())  # send next frame
+        seq += 1
+        frame += 1
+        time.sleep(2)
+    else:
+        print('acknowledgement not received')
+        print('Frames sent ->', msg)
+        c.send(str(msg).encode())   # resend the same frame again
+        time.sleep(2)
+#receiver side 
+import socket
+import time
+
+s = socket.socket()
+s.connect(("localhost", 8011))        # Connect to sender
+while 1:
+    msg = s.recv(2).decode()         # Receive frame number
+    print("Received --> ", int(msg))
+    s.send(str(msg).encode())        # Send ACK for that frame
+    time.sleep(1)
